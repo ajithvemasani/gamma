@@ -1,3 +1,24 @@
+from sudoku import Sudoku
+
+#When user wants to play sudoku then this method will generate a sudoku board based on difficulty level
+def generate_board():
+    while True:
+        try:
+            difficulty_level = int(input('\nDifficulty levels \n1. Beginner \n2. Intermediate \n3. Expert \nPlease enter which level you prefer 1 or 2 or 3.\n'))
+            assert 0 < difficulty_level < 4
+            break
+        except ValueError:
+            print("\nInvalid input! Please enter a valid number.")
+        except AssertionError:
+            print("\nThe number should be either 1 or 2 or 3. Please try again.")
+    
+    difficulty_level = 0.25 * difficulty_level
+    puzzle = Sudoku(3).difficulty(difficulty_level)
+    board = puzzle.board
+    #replace 'None' given by Sudoku library with '.' and return board
+    board = [[int(element) if element != None else 0 for element in row] for row in board]
+    return board
+
 def get_board():
     # Get user input for Sudoku puzzle ('.' denotes an empty cell). Returns a board
     board = []
@@ -59,7 +80,20 @@ def values_print(board):
 
 def main():
     """Main function."""
-    board = get_board()
+    while True:
+        try:
+            userChoice = int(input("\n1.Do you have a sudoku game?\nOR\n2.Do you want to generate one Sudoku game?\nPlease enter your choice as either 1 or 2.\n"))
+            assert 0 < userChoice < 3
+            break
+        except ValueError:
+            print("\nInvalid input! Please enter a valid number.")
+        except AssertionError:
+            print("\nThe number should be either 1 or 2. Please try again.")
+            
+    if userChoice == 1:
+        board = get_board()
+    elif userChoice == 2:
+        board = generate_board()
     print_board(board)
     if board:
         values_print(board)
