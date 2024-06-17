@@ -37,7 +37,7 @@ def numbers_possible(board,Row,Column):
     #checking row
     Values=Values-set(board[Row])
     #checking for column
-    Values=Values-{board[r][column] for r in range(9)}
+    Values=Values-{board[r][Column] for r in range(9)}
     #checking the grid
     s_row,s_col=3*(Row//3),3*(Column//3)
     for r in range(s_row,s_row+3):
