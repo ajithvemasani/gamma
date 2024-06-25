@@ -138,6 +138,12 @@ def generate_reason(num, board, row, col):
 
 def generate_hint_reason(possible_numbers, board, row, col):
     return f"The possible numbers are valid because they do not repeat in the same row, column, or 3x3 grid."
+    print("The possible values for each cell:")
+    for Row in range(9):
+        for Column in range(9):
+            if board[Row][Column] == 0:
+                Values=numbers_possible(board,Row,Column)
+                print(f"Cell({Row+1},{Column+1}): {Values}")
 
 def main():
     """Main function."""
