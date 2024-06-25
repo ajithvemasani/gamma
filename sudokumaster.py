@@ -68,15 +68,12 @@ def numbers_possible(board,Row,Column):
 
 #printing possible numbers
 def values_print(board):
-    print("The possible values for empty cell in each column:")
-    for Column in range(9):
-        print(f"column {Column+1}:")
-        for Row in range(9):
-            if board[Row][Column]==0:
+    print("The possible values for each cell:")
+    for Row in range(9):
+        for Column in range(9):
+            if board[Row][Column] == 0:
                 Values=numbers_possible(board,Row,Column)
-                print(f"Row {Row+1}: {Values}")
-        print()
-
+                print(f"Cell({Row+1},{Column+1}): {Values}")
 
 def main():
     """Main function."""
