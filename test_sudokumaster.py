@@ -1,4 +1,5 @@
 from sudoku import Sudoku
+import pytest
 
 #When user wants to play sudoku then this method will generate a sudoku board based on difficulty level
 def generate_board():
@@ -32,6 +33,34 @@ def get_board():
         board.append(row)
     return board
 
+def test_get_board(monkeypatch):
+    inputs = iter([
+    "123456789",
+    "45.789.23",
+    ".8912345.",
+    "...567891",
+    "567...234",
+    "891234...",
+    "345678912",
+    "678912345",
+    "........."
+    ])
+    monkeypatch.setattr('builtins.input', lambda _: next(inputs))
+    board = get_board()
+    assert len(board) == 9
+    assert all(len(row) == 9 for row in board)
+    assert board == [
+        [1, 2, 3, 4, 5, 6, 7, 8, 9],
+        [4, 5, 0, 7, 8, 9, 0, 2, 3],
+        [0, 8, 9, 1, 2, 3, 4, 5, 0],
+        [0, 0, 0, 5, 6, 7, 8, 9, 1],
+        [5, 6, 7, 0, 0, 0, 2, 3, 4],
+        [8, 9, 1, 2, 3, 4, 0, 0, 0],
+        [3, 4, 5, 6, 7, 8, 9, 1, 2],
+        [6, 7, 8, 9, 1, 2, 3, 4, 5],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0]
+    ]
+
 def print_board(board):
     """Function to print the Sudoku board."""
     if board != []:
@@ -47,6 +76,45 @@ def print_board(board):
     else:
         print("The board is empty :(")
     print()
+
+def test_print_board_valid(capfd):
+    board = [
+        [5, 3, 0, 0, 7, 0, 0, 0, 0],
+        [6, 0, 0, 1, 9, 5, 0, 0, 0],
+        [0, 9, 8, 0, 0, 0, 0, 6, 0],
+        [8, 0, 0, 0, 6, 0, 0, 0, 3],
+        [4, 0, 0, 8, 0, 3, 0, 0, 1],
+        [7, 0, 0, 0, 2, 0, 0, 0, 6],
+        [0, 6, 0, 0, 0, 0, 2, 8, 0],
+        [0, 0, 0, 4, 1, 9, 0, 0, 5],
+        [0, 0, 0, 0, 8, 0, 0, 7, 9]
+    ]
+
+    expected_output = (
+        "+-------+-------+-------+\n"
+        "| 5 3 . | . 7 . | . . . |\n"
+        "| 6 . . | 1 9 5 | . . . |\n"
+        "| . 9 8 | . . . | . 6 . |\n"
+        "+-------+-------+-------+\n"
+        "| 8 . . | . 6 . | . . 3 |\n"
+        "| 4 . . | 8 . 3 | . . 1 |\n"
+        "| 7 . . | . 2 . | . . 6 |\n"
+        "+-------+-------+-------+\n"
+        "| . 6 . | . . . | 2 8 . |\n"
+        "| . . . | 4 1 9 | . . 5 |\n"
+        "| . . . | . 8 . | . 7 9 |\n"
+        "+-------+-------+-------+\n"
+        "\n"
+    )
+
+    print_board(board)
+    captured = capfd.readouterr()
+    assert captured.out == expected_output
+
+def test_print_board_invalid(capfd):
+    print_board([])
+    captured = capfd.readouterr()
+    assert captured.out == "The board is empty :(\n\n"
 
 #function for possible numbers
 def numbers_possible(board,Row,Column):
