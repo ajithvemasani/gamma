@@ -30,7 +30,30 @@ solution_board = [
 root = tk.Tk()
 root.title("Sudoku Master")
 
-# Function to validate and update cell color
+# Function to check possible numbers for a given cell
+def get_possible_numbers(board, row, col):
+    if board[row][col] != 0:
+        return []
+    
+    possible_numbers = set(range(1, 10))
+    
+    # Remove numbers present in the same row and column
+    for i in range(9):
+        if board[row][i] != 0:
+            possible_numbers.discard(board[row][i])
+        if board[i][col] != 0:
+            possible_numbers.discard(board[i][col])
+    
+    # Remove numbers present in the same 3x3 sub-grid
+    start_row, start_col = 3 * (row // 3), 3 * (col // 3)
+    for i in range(3):
+        for j in range(3):
+            if board[start_row + i][start_col + j] != 0:
+                possible_numbers.discard(board[start_row + i][start_col + j])
+    
+    return list(possible_numbers)
+
+# Function to validate and update cell color, and show hints
 def validate_and_update(event, i, j):
     entry = entries[i][j]
     value = entry.get()
@@ -44,6 +67,14 @@ def validate_and_update(event, i, j):
         entry.delete(0, tk.END)
         entry.config(bg='white')
 
+        # Show possible numbers as hint
+        possible_numbers = get_possible_numbers(initial_board, i, j)
+        if possible_numbers:
+            hint = f"{possible_numbers}"
+            hint_label.config(text=f"Possible numbers for cell ({i+1},{j+1}): {hint}")
+        else:
+            hint_label.config(text="")
+
 # Create a 9x9 grid of entry widgets
 entries = []
 for i in range(9):
@@ -56,9 +87,14 @@ for i in range(9):
         else:
             entry = tk.Entry(root, width=2, font=('Arial', 20, 'bold'), justify='center')
             entry.bind('<FocusOut>', lambda event, i=i, j=j: validate_and_update(event, i, j))
+            entry.bind('<FocusIn>', lambda event, i=i, j=j: validate_and_update(event, i, j))
         entry.grid(row=i, column=j, padx=1, pady=1)
         row.append(entry)
     entries.append(row)
+
+# Hint label to display possible numbers
+hint_label = tk.Label(root, text="", font=('Arial', 12))
+hint_label.grid(row=9, column=0, columnspan=9)
 
 # Run the main event loop
 root.mainloop()
