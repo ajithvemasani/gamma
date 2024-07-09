@@ -15,27 +15,34 @@ puzzle = [
 ]
 
 class SudokuGUI:
-    def __init__(self, master):
+    def _init_(self, master):
         self.master = master
         self.master.title("Sudoku Solver")
         self.cells = {}
         self.create_widgets()
 
     def create_widgets(self):
-        for row in range(9):
-            for col in range(9):
-                var = tk.StringVar()
-                entry = tk.Entry(self.master, textvariable=var, font=('Arial', 10), width=2, justify='center')
-                entry.grid(row=row, column=col, sticky="nsew")
-                entry.bind('<FocusIn>', lambda e, r=row, c=col: self.focus_in_action(r, c))
-                entry.bind('<FocusOut>', lambda e, r=row, c=col: self.focus_out_action(r, c))
-                if puzzle[row][col] != 0:
-                    var.set(puzzle[row][col])
-                    entry.config(font=('Arial', 40), state='readonly')
+        for row in range(12):
+            for col in range(12):
+                if row % 4 == 0 or col % 4 == 0:
+                    frame = tk.Frame(self.master, bg='black', width=3 if col % 4 == 0 else 1, height=3 if row % 4 == 0 else 1)
+                    frame.grid(row=row, column=col, sticky="nsew")
                 else:
-                    self.display_possible_numbers(entry, row, col)
-                self.cells[(row, col)] = (entry, var)
-
+                    adj_row = row - (row // 4) - 1
+                    adj_col = col - (col // 4) - 1
+                    var = tk.StringVar()
+                    entry = tk.Entry(self.master, textvariable=var, font=('Arial', 10), width=2, justify='center', bd=1)
+                    entry.grid(row=row, column=col, sticky="nsew", padx=1, pady=1)
+                    entry.bind('<FocusIn>', lambda e, r=adj_row, c=adj_col: self.focus_in_action(r, c))
+                    entry.bind('<FocusOut>', lambda e, r=adj_row, c=adj_col: self.focus_out_action(r, c))
+                    if puzzle[adj_row][adj_col] != 0:
+                        var.set(puzzle[adj_row][adj_col])
+                        entry.config(font=('Arial', 40), state='readonly')
+                    else:
+                        self.display_possible_numbers(entry, adj_row, adj_col)
+                    self.cells[(adj_row, adj_col)] = (entry, var)
+        
+                    
     def focus_in_action(self, row, col):
         entry, var = self.cells[(row, col)]
         if puzzle[row][col] == 0:
@@ -98,5 +105,5 @@ def main():
     gui = SudokuGUI(root)
     root.mainloop()
 
-if __name__ == "__main__":
+if _name_ == "_main_":
     main()
