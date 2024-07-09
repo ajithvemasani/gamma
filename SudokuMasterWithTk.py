@@ -15,7 +15,7 @@ puzzle = [
 ]
 
 class SudokuGUI:
-    def _init_(self, master):
+    def __init__(self, master):
         self.master = master
         self.master.title("Sudoku Solver")
         self.cells = {}
@@ -105,5 +105,5 @@ def main():
     gui = SudokuGUI(root)
     root.mainloop()
 
-if _name_ == "_main_":
+if __name__ == "__main__":
     main()
