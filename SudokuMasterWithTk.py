@@ -41,6 +41,9 @@ class SudokuGUI:
                     else:
                         self.display_possible_numbers(entry, adj_row, adj_col)
                     self.cells[(adj_row, adj_col)] = (entry, var)
+    
+        Single_Value_Rule_button = tk.Button(self.master, text="Single Value Rule", command=self.single_value_rule)
+        Single_Value_Rule_button.grid(row=12, column=0, columnspan=3, sticky="nsew")
         
                     
     def focus_in_action(self, row, col):
@@ -99,6 +102,21 @@ class SudokuGUI:
         for i in range(block_row, block_row + 3):
             for j in range(block_col, block_col + 3):
                 if (i != row or j != col): self.display_possible_numbers(self.cells[(i, j)][0], i, j)
+
+    def single_value_rule(self):
+        for row in range(9):
+            for col in range(9):
+                if puzzle[row][col] == 0:
+                    possible = self.possible_numbers(row, col) 
+                    if len(possible) == 1:
+                        puzzle[row][col] = list(possible)[0]
+                        entry = self.cells[(row, col)]
+                        entry.config(font=('Arial', 40), fg='black', state='readonly')
+                        self.update_related_cells(row, col)
+                        alertMessage = "Single Value Rule Applied for Cell: " + str(row+1) + " , " + str(col+1)
+                        messagebox.showerror("Alert", alertMessage)
+                        return row, col, possible
+        return
 
 def main():
     root = tk.Tk()
