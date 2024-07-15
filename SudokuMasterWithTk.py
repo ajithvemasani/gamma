@@ -19,6 +19,7 @@ class SudokuGUI:
         self.master = master
         self.master.title("Sudoku Solver")
         self.cells = {}
+        self.undo_stack = []  # Storing numbers as a stack to pop the most recent number
         self.create_widgets()
 
     def create_widgets(self):
@@ -41,11 +42,13 @@ class SudokuGUI:
                     else:
                         self.display_possible_numbers(entry, adj_row, adj_col)
                     self.cells[(adj_row, adj_col)] = (entry, var)
-    
+
         Single_Value_Rule_button = tk.Button(self.master, text="Single Value Rule", command=self.single_value_rule)
         Single_Value_Rule_button.grid(row=12, column=0, columnspan=3, sticky="nsew")
         
-                    
+        Undo_button = tk.Button(self.master, text="Undo", command=self.undo)
+        Undo_button.grid(row=12, column=3, columnspan=3, sticky="nsew")
+    
     def focus_in_action(self, row, col):
         entry, var = self.cells[(row, col)]
         if puzzle[row][col] == 0:
@@ -58,6 +61,7 @@ class SudokuGUI:
             value = int(var.get())
             if 1 <= value <= 9:
                 if self.is_valid(value, row, col):
+                    self.undo_stack.append((row, col, puzzle[row][col]))  # Push the current state onto the stack
                     puzzle[row][col] = value
                     entry.config(state='readonly')
                     self.update_related_cells(row, col)
@@ -109,14 +113,33 @@ class SudokuGUI:
                 if puzzle[row][col] == 0:
                     possible = self.possible_numbers(row, col) 
                     if len(possible) == 1:
+                        self.undo_stack.append((row, col, puzzle[row][col]))  # Push the current state onto the stack
                         puzzle[row][col] = list(possible)[0]
-                        entry = self.cells[(row, col)]
+                        entry, var = self.cells[(row, col)]
+                        var.set(puzzle[row][col])
                         entry.config(font=('Arial', 40), fg='black', state='readonly')
                         self.update_related_cells(row, col)
                         alertMessage = "Single Value Rule Applied for Cell: " + str(row+1) + " , " + str(col+1)
-                        messagebox.showerror("Alert", alertMessage)
+                        messagebox.showinfo("Alert", alertMessage)
                         return row, col, possible
         return
+
+    # Option for undo and go back to one step each time when we press undo button
+    def undo(self):
+        if self.undo_stack:
+            row, col, prev_value = self.undo_stack.pop()  # Pop the last change from the stack
+            puzzle[row][col] = prev_value
+            entry, var = self.cells[(row, col)]
+            if prev_value == 0:
+                var.set('')
+                entry.config(font=('Arial', 12), fg='gray', state='normal')
+                self.display_possible_numbers(entry, row, col)
+            else:
+                var.set(prev_value)
+                entry.config(font=('Arial', 40), state='readonly')
+            self.update_related_cells(row, col)
+        else:
+            messagebox.showinfo("Undo", "No moves to undo.")
 
 def main():
     root = tk.Tk()
